@@ -17,7 +17,7 @@ db.posts.updateOne({id: "1"},{$set:{title: "new title"}})
 db.posts.deleteOne({id: "1"})
 
 
-// STRETCH
+//////////////////////////// STRETCH
 
 // insert multiple blog posts
 db.posts.insertMany([
@@ -71,3 +71,24 @@ db.posts.updateMany({
 
 // delete multiple posts
 db.posts.deleteMany({author: "updated author"})
+
+
+//////////////////////////// GETPOSTS
+
+const getPosts = (limit, skip, sortField, sortOrder, filterField, filterValue) => {
+    let sort = {}
+    sortField ? sort[sortField] = sortOrder : sort
+
+    let filter = {}
+    filterField ? filter[filterField] = filterValue : filter
+    
+    let dbResult = db.posts.find(filter).limit(limit).skip(skip).sort(sort).toArray()
+     
+    return dbResult
+}
+
+// console.log(getPosts())
+// console.log(getPosts(10))
+// console.log(getPosts(10, 3))
+// console.log(getPosts(10, 3, 'lastModified', -1))
+console.log(getPosts(50, 0, 'lastModified', -1, 'id', '10'))
