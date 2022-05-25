@@ -77,10 +77,10 @@ db.posts.deleteMany({author: "updated author"})
 
 const getPosts = (limit, skip, sortField, sortOrder, filterField, filterValue) => {
     let sort = {}
-    sortField ? sort[sortField] = sortOrder : sort
+    sortField && sortOrder ? sort[sortField] = sortOrder : sort
 
     let filter = {}
-    filterField ? filter[filterField] = filterValue : filter
+    filterField && filterValue ? filter[filterField] = filterValue : filter
     
     let dbResult = db.posts.find(filter).limit(limit).skip(skip).sort(sort).toArray()
      
