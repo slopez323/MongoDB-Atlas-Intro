@@ -92,3 +92,76 @@ const getPosts = (limit, skip, sortField, sortOrder, filterField, filterValue) =
 // console.log(getPosts(10, 3))
 // console.log(getPosts(10, 3, 'lastModified', -1))
 console.log(getPosts(50, 0, 'lastModified', -1, 'id', '10'))
+
+
+//////////////////////////// CONVERT ID TO INT
+assert(parseFloat(db.version()) >= 4.2, "The pipeline parameters of the 'update' method need MongoDB Server 4.2 or plus.");
+
+db.getCollection("posts").update(
+    {
+        // _id: ObjectId("628d2580aece93b134a25378"), //only update current doc
+        "id" : { $type: "string" }  //update all of type string
+    },
+    [{
+        $set: {
+            "id":
+            {
+                $convert: {
+                    input: "$id",
+                    to: "int", //available convert types: string|bool|int|long|double|decimal|date|timestamp|objectId ...
+                    //onError:"$id", //remain unchanged
+                    //onNull: 0, //if the input is null or missing
+                }
+            },
+        }
+    }],
+    { multi: true }
+)
+
+
+// find single blog post given an ID
+const findPost = (blogID) => db.posts.find({id: blogID}).toArray()
+
+console.log(findPost(45))
+
+// length of blog posts collection
+const getPostsCollectionLength = () => db.posts.count()
+
+console.log(getPostsCollectionLength())
+
+// new blog post
+const makePost = (title, text, author, category) => {
+  const today = new Date().toISOString()
+  const blogID = getPostsCollectionLength() + 1
+
+  db.posts.insertOne({
+  'createdAt': today,
+  'title': title,
+  'text': text,
+  'author': author,
+  'lastModified': today,
+  'category': category,
+  'id': blogID
+})
+}
+
+makePost('test', 'test', 'test', 'test')
+
+// update info
+const updatePost = (blogId, title, text, author, category) => {
+  const today = new Date().toISOString()
+  if (title) db.posts.updateOne({id: blogId},{$set:{title: title}})
+  if (text) db.posts.updateOne({id: blogId},{$set:{text: text}})
+  if (author) db.posts.updateOne({id: blogId},{$set:{author: author}})
+  if (category) db.posts.updateOne({id: blogId},{$set:{category: category}})
+  db.posts.updateOne({id: blogId},{$set:{lastModified: today}})
+}
+
+updatePost(51, 'change', 'change', 'change', 'change')
+
+// delete posts with matching ids
+const deletePosts = (blogIds) => {
+  blogIds.forEach(id => db.posts.deleteOne({id: id}))
+}
+
+deletePosts([50, 51, 52])
