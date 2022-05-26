@@ -125,14 +125,14 @@ db.getCollection("posts").update(
 
 
 // find single blog post given an ID
-const findPost = (blogID) => db.posts.find({ id: blogID }).toArray()
+const findPost = (blogID) => db.posts.find({ id: blogID })
 
-console.log(findPost(45))
+findPost(45)
 
 // length of blog posts collection
 const getPostsCollectionLength = () => db.posts.count()
 
-console.log(getPostsCollectionLength())
+getPostsCollectionLength()
 
 // new blog post
 const makePost = (title, text, author, category) => {
